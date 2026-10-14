@@ -1,0 +1,201 @@
+{
+  "info": {
+    "name": "API de experiencias profesionales",
+    "description": "Pruebas del CRUD Express.js y MongoDB. Ejecutar con MongoDB activo y en orden.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "experienciaId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Estado de la API y MongoDB",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('MongoDB conectado', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().database).to.eql('connected');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Crear experiencia",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"puesto\": \"Desarrollador Full Stack\",\n  \"empresa\": \"Digital Innovations Ltd.\",\n  \"fechaInicio\": \"2021\",\n  \"fechaFin\": \"Actualidad\",\n  \"descripcion\": \"Desarrollo de aplicaciones web y plataformas empresariales.\",\n  \"logros\": [\"Desarrollo con React y Node.js\", \"Implementación de pruebas automatizadas\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/experiencias"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Experiencia creada', function () {",
+              "  pm.response.to.have.status(201);",
+              "  const experiencia = pm.response.json();",
+              "  pm.expect(experiencia).to.have.property('_id');",
+              "  pm.collectionVariables.set('experienciaId', experiencia._id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Listar experiencias",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/experiencias"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Lista de experiencias recibida', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json()).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Consultar experiencia por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/experiencias/{{experienciaId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Experiencia encontrada', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('experienciaId'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Actualizar experiencia",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"puesto\": \"Desarrollador Senior\",\n  \"empresa\": \"Digital Innovations Ltd.\",\n  \"fechaInicio\": \"2021\",\n  \"fechaFin\": \"Actualidad\",\n  \"descripcion\": \"Liderazgo técnico y desarrollo de plataformas web empresariales.\",\n  \"logros\": [\"Liderazgo de equipo\", \"Entrega de APIs REST\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/experiencias/{{experienciaId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Experiencia actualizada', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().puesto).to.eql('Desarrollador Senior');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Eliminar experiencia",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/experiencias/{{experienciaId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Experiencia eliminada', function () {",
+              "  pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Confirmar eliminación",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/experiencias/{{experienciaId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('La experiencia ya no existe', function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
